@@ -4,12 +4,12 @@
 BACKUP_DIR="/backups/swift"
 DATE=$(date +%F)
 RETENTION_DAYS=7
-export OS_USER_ID=0d04d8097c2e48b0ae2457ad86075b38
-export OS_PASSWORD=0b24b045ef604Aad9377BccabDbd8eb9
+export OS_USER_ID=user-id
+export OS_PASSWORD=password
 export OS_USER_DOMAIN_NAME=Default
-export OS_TENANT_ID=dfa6a7f8b338460c9a9308db982e750f
+export OS_TENANT_ID=tenant-id
 export OS_PROJECT_DOMAIN_NAME=Default
-export OS_AUTH_URL=http://192.168.19.100:5000/v3
+export OS_AUTH_URL=http://endpoint:5000/v3
 export OS_IDENTITY_API_VERSION=3
 
 mkdir -p "$BACKUP_DIR"
@@ -33,7 +33,7 @@ backup_project() {
     local project=$1
     local backup_dir=$2
     local backup_date=$3
-    export OS_STORAGE_URL="http://192.168.19.100:8080/v1/AUTH_$project"
+    export OS_STORAGE_URL="http://endpoint:8080/v1/AUTH_$project"
 
     mkdir -p "$backup_dir/$backup_date/$project"
 
@@ -53,7 +53,7 @@ backup_project() {
 START_TIME=$(date +%s)
 
 # Get project IDs from keystone and back them up
-mysql -Ns -h 192.168.19.100 -u backup -p'backup@abriment' -D keystone \
+mysql -Ns -h endpoint -u backup -p'backup' -D keystone \
     -e "SELECT id FROM project WHERE domain_id='default' ORDER BY id" | while read -r project; do
     run_with_limit backup_project "$project" "$BACKUP_DIR" "$DATE"
 done
